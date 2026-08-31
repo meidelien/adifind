@@ -1,0 +1,192 @@
+[build-system]
+requires = ["setuptools>=61.0,<82", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "adifind"
+version = "16.0.0"
+description = "Advanced Adipocyte Detection and Analysis in Whole Slide Images"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Martin Eide Lien", email = "martin.eide.lien@example.com"}
+]
+requires-python = ">=3.9"
+keywords = [
+    "pathology",
+    "whole-slide-imaging",
+    "WSI",
+    "adipocyte",
+    "deep-learning",
+    "detectron2",
+    "instance-segmentation",
+    "digital-pathology",
+    "medical-imaging"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+    "Topic :: Scientific/Engineering :: Image Processing",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+]
+
+dependencies = [
+    # Compatibility guard for Detectron2 and legacy dependencies using pkg_resources
+    "setuptools<82",
+
+    # Core scientific computing
+    "numpy>=1.21.0,<2",
+    "scipy>=1.7.0",
+    "pandas>=1.3.0",
+    
+    # Image processing
+    "opencv-python>=4.5.0",
+    "Pillow>=9.0.0",
+    "scikit-image>=0.19.0",
+    "tifffile>=2022.0.0",
+    
+    # Visualization
+    "matplotlib>=3.5.0",
+    "tqdm>=4.62.0",
+    
+    # Whole slide image support
+    "openslide-python>=1.4.0",
+    
+    # Model downloading from HuggingFace Hub
+    "huggingface-hub>=0.20.0",
+    "requests>=2.28.0",
+    
+    # Deep learning (PyTorch)
+    # Note: torch and torchvision should be installed separately
+    # with the appropriate CUDA version for your system
+    # See: https://pytorch.org/get-started/locally/
+    
+    # Note: detectron2 requires special installation
+    # See: https://detectron2.readthedocs.io/en/latest/tutorials/install.html
+]
+
+[project.optional-dependencies]
+# GPU acceleration with CuPy (install appropriate CUDA version)
+gpu = [
+    "cupy-cuda12x>=12.0.0",
+]
+
+# Alternative CuPy for CUDA 11
+gpu-cuda11 = [
+    "cupy-cuda11x>=11.0.0",
+]
+
+# Additional WSI format support
+slideio = [
+    "slideio>=2.0.0",
+]
+
+# Development dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=0.990",
+    "isort>=5.10.0",
+]
+
+# Documentation
+docs = [
+    "sphinx>=4.0.0",
+    "sphinx-rtd-theme>=1.0.0",
+]
+
+# All optional dependencies (except GPU variants)
+all = [
+    "slideio>=2.0.0",
+    "pytest>=7.0.0",
+    "black>=22.0.0",
+]
+
+# Jupyter notebook quickstart
+notebook = [
+    "jupyter>=1.0.0",
+    "ipywidgets>=8.0.0",
+]
+
+# Benchmarking adapters (Adiposoft ROI ZIP parsing)
+benchmarking = [
+    "roifile>=2024.1.10",
+]
+
+[project.scripts]
+adifind = "main:main"
+adifind-curate = "result_processing.adifind_image_curation_tool:main"
+
+[project.urls]
+Homepage = "https://github.com/meidelien/adifind"
+Repository = "https://github.com/meidelien/adifind"
+Documentation = "https://github.com/meidelien/adifind#readme"
+"Bug Tracker" = "https://github.com/meidelien/adifind/issues"
+
+[tool.setuptools]
+package-dir = {"" = "code"}
+
+[tool.setuptools.packages.find]
+where = ["code"]
+
+[tool.setuptools.package-data]
+"*" = ["*.yaml", "*.json"]
+
+# ================================================================
+# DEVELOPMENT TOOL CONFIGURATION
+# ================================================================
+
+[tool.black]
+line-length = 100
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.venv
+    | __pycache__
+    | archived_output
+    | example_data
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip_gitignore = true
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "archived_output",
+    "example_data",
+]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["code"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::FutureWarning",
+]

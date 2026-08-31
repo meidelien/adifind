@@ -1,0 +1,58 @@
+Bootstrap: docker
+From: pytorch/pytorch:2.1.0-cuda12.1-cudnn8-runtime
+
+%labels
+    Author Martin Eide Lien
+    Version 0.9
+    Description AdiFind - Adipocyte Detection in Whole Slide Images
+
+%help
+    AdiFind: Automated adipocyte detection and analysis for whole slide images.
+
+    Usage (GPU):
+        apptainer run --nv adifind.sif /data/slide.svs --tissue_guidance
+
+    Usage (CPU):
+        apptainer run adifind.sif /data/slide.svs --tissue_guidance --disable_gpu_accel
+
+    Bind mount your data directory:
+        apptainer run --nv --bind /path/to/slides:/data adifind.sif /data/slide.svs --tissue_guidance
+
+    The Hugging Face model repository is currently private.
+    For no-token runs, bind local canonical model files and set environment
+    variables that point to directories containing these filenames:
+        adifind_adipocyte.pth
+        adifind_tumor.pth
+        adifind_tissue_guidance.pth
+
+    Example:
+        export APPTAINERENV_ADIFIND_ADIPOCYTE_MODEL_DIR=/path/to/adipocyte
+        export APPTAINERENV_ADIFIND_TUMOR_MODEL_DIR=/path/to/tumor
+        export APPTAINERENV_ADIFIND_TISSUE_MODEL_DIR=/path/to/tissue
+
+%environment
+    export DEBIAN_FRONTEND=noninteractive
+    export LANG=C.UTF-8
+
+%files
+    code/ /opt/adifind/code/
+    pyproject.toml /opt/adifind/pyproject.toml
+    README.md /opt/adifind/README.md
+
+%post
+    apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        git \
+        libgl1-mesa-glx \
+        libglib2.0-0 \
+        && rm -rf /var/lib/apt/lists/*
+
+    pip install --no-cache-dir 'numpy<2'
+    pip install --no-cache-dir 'setuptools<82'
+    pip install --no-cache-dir openslide-bin
+    pip install --no-cache-dir 'git+https://github.com/facebookresearch/detectron2.git'
+    cd /opt/adifind && pip install --no-cache-dir -e .
+
+%runscript
+    cd /opt/adifind/code
+    exec adifind "$@"

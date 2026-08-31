@@ -1,0 +1,102 @@
+# =============================================================================
+# AdiFind Docker Image - CPU Only Version
+# =============================================================================
+# Automated Adipocyte Detection for Whole Slide Images
+#
+# This is a CPU-only version for users without NVIDIA GPUs.
+# Processing will be significantly slower than GPU version.
+#
+# Build:
+#   docker build -t adifind:cpu -f docker/Dockerfile.cpu .
+#
+# Run:
+#   docker run -v /path/to/images:/data/input -v /path/to/output:/data/output \
+#       adifind:cpu /data/input/slide.svs --output_dir /data/output
+# =============================================================================
+
+FROM python:3.10-slim-bookworm
+
+LABEL maintainer="Martin Eide Lien"
+LABEL description="AdiFind - Automated Adipocyte Detection (CPU-only)"
+LABEL version="1.0"
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# =============================================================================
+# SYSTEM DEPENDENCIES
+# =============================================================================
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    git \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# =============================================================================
+# PYTHON DEPENDENCIES
+# =============================================================================
+
+WORKDIR /app
+
+# Upgrade pip to avoid dependency-resolution issues in older pip versions.
+RUN python -m pip install --no-cache-dir --upgrade "pip==26.2.1"
+
+# Build tooling.
+RUN python -m pip install --no-cache-dir 'setuptools<82' wheel
+
+# Runtime dependencies.
+RUN python -m pip install --no-cache-dir 'numpy<2'
+RUN python -m pip install --no-cache-dir openslide-bin
+
+RUN python -m pip install --no-cache-dir \
+    torch==2.1.0 torchvision==0.16.0 \
+    --index-url https://download.pytorch.org/whl/cpu
+
+# Detectron2 imports torch during setup, so it must be built using the
+# existing environment rather than pip's isolated build environment.
+RUN python -m pip install --no-cache-dir --no-build-isolation \
+    'git+https://github.com/facebookresearch/detectron2.git@a2f4a8771ab77e8411c26b27f24f9489a28a2453'
+
+COPY pyproject.toml README.md /app/
+COPY code/ /app/code/
+
+RUN python -m pip install --no-cache-dir -e .
+
+# =============================================================================
+# MODEL FILES
+# =============================================================================
+# Canonical AdiFind model directories are bundled when present.
+# Structure:
+#   /app/models/adipocyte/adifind_adipocyte.pth
+#   /app/models/tumor/adifind_tumor.pth
+#   /app/models/tissue/adifind_tissue_guidance.pth
+
+COPY docker/models/ /app/models/
+
+# =============================================================================
+# ENVIRONMENT CONFIGURATION
+# =============================================================================
+
+ENV ADIFIND_USE_GPU=false
+ENV PYTHONPATH=/app/code
+
+# =============================================================================
+# ENTRYPOINT
+# =============================================================================
+
+COPY docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+RUN mkdir -p /data/input /data/output
+
+WORKDIR /app/code
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["--help"]

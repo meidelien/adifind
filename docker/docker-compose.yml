@@ -1,0 +1,96 @@
+# =============================================================================
+# AdiFind Docker Compose Configuration
+# =============================================================================
+# Easy deployment configuration for AdiFind containerized analysis
+#
+# Usage:
+#   GPU version:
+#     docker compose build adifind-gpu
+#     docker compose run --rm adifind-gpu --help
+#   
+#   CPU version:
+#     docker compose build adifind-cpu
+#     docker compose run --rm adifind-cpu --help
+#
+#   Custom analysis:
+#     docker compose run --rm adifind-gpu /data/input/your_slide.svs --output_dir /data/output
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # GPU-ACCELERATED VERSION
+  # ===========================================================================
+  adifind-gpu:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: adifind:gpu
+    container_name: adifind-gpu
+    
+    # GPU passthrough - requires NVIDIA Container Toolkit
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    
+    # Mount points for data
+    volumes:
+      # Input: Mount your WSI directory here
+      - ./input:/data/input:ro
+      # Output: Results will be written here
+      - ./output:/data/output
+    
+    # Default command (can be overridden with docker compose run)
+    command: ["--help"]
+    
+    # Environment variables (optional overrides)
+    environment:
+      - ADIFIND_USE_GPU=true
+
+  # ===========================================================================
+  # CPU-ONLY VERSION
+  # ===========================================================================
+  adifind-cpu:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.cpu
+    image: adifind:cpu
+    container_name: adifind-cpu
+    
+    # Mount points for data
+    volumes:
+      - ./input:/data/input:ro
+      - ./output:/data/output
+    
+    command: ["--help"]
+    
+    environment:
+      - ADIFIND_USE_GPU=false
+
+# =============================================================================
+# EXAMPLE USAGE
+# =============================================================================
+#
+# 1. Build the images:
+#    docker compose build adifind-gpu
+#    docker compose build adifind-cpu
+#
+# 2. Run analysis on a single slide (GPU):
+#    docker compose run --rm adifind-gpu /data/input/slide.svs --output_dir /data/output --tissue_guidance
+#
+# 3. Run batch analysis (GPU):
+#    docker compose run --rm adifind-gpu /data/input --output_dir /data/output --tissue_guidance
+#
+# 4. Run with custom options:
+#    docker compose run --rm adifind-gpu /data/input/slide.svs \
+#        --output_dir /data/output \
+#        --tissue_guidance \
+#        --tumor_segmentation \
+#        --save_distance_map
+#
+# 5. Run CPU version (slower, no GPU required):
+#    docker compose run --rm adifind-cpu /data/input/slide.svs --output_dir /data/output --tissue_guidance
+# =============================================================================

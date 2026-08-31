@@ -1,0 +1,5 @@
+# Docker model files (large binary files, not in repo)
+docker/models/**/*.pth
+docker/input/
+docker/output/
+resolution_cache.json
