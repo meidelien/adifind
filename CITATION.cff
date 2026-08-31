@@ -1,12 +1,12 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "AdiFind: Automated Adipocyte Detection and Analysis in Whole Slide Images"
+title: "Computer vision quantification of tumour-adipocyte architecture across obesity-associated cancers predicts breast cancer outcome"
 type: software
 authors:
   - family-names: "Lien"
     given-names: "Martin Eide"
     # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO: Add your ORCID
-version: "16.0.0"
+version: "1.0.0"
 date-released: "2026-04-19"
 license: MIT
 url: "https://github.com/meidelien/adifind"
