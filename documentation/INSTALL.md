@@ -20,8 +20,6 @@ For a first-run walkthrough after setup, see [Quick Start](getting-started.md). 
 | HPC cluster | [Track C: Apptainer / Singularity (HPC)](#track-c-apptainer--singularity-hpc) |
 | Custom pip environment | [Manual Installation (pip)](#manual-installation-pip) |
 
-> **Model access:** the Hugging Face model repository is currently private. Auto-download works only for authenticated users right now. For no-token installs, use local canonical checkpoint files named `adifind_adipocyte.pth`, `adifind_tumor.pth`, and `adifind_tissue_guidance.pth`. Once the repo is public, the same auto-download path will work without authentication.
-
 ---
 
 ## Track A: Conda Environment
