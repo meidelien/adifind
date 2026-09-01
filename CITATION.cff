@@ -1,16 +1,42 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
+
 title: "Computer vision quantification of tumour-adipocyte architecture across obesity-associated cancers predicts breast cancer outcome"
 type: software
+
 authors:
   - family-names: "Lien"
     given-names: "Martin Eide"
-    # orcid: "https://orcid.org/0000-0000-0000-0000"  # TODO: Add your ORCID
+
+  - family-names: "Hartel"
+    given-names: "Gunter"
+
+  - family-names: "Tran"
+    given-names: "Khoa A"
+
+  - family-names: "Waddell"
+    given-names: "Nicola"
+
+  - family-names: "Brownrigg"
+    given-names: "Sunniva S"
+
+  - family-names: "Bouttle"
+    given-names: "Kelsie"
+
+  - family-names: "O'Mara"
+    given-names: "Tracy"
+
+  - family-names: "Halberg"
+    given-names: "Nils"
+
 version: "1.0.0"
 date-released: "2026-04-19"
+
 license: MIT
+
 url: "https://github.com/meidelien/adifind"
 repository-code: "https://github.com/meidelien/adifind"
+
 keywords:
   - adipocyte
   - whole-slide-imaging
@@ -18,6 +44,7 @@ keywords:
   - deep-learning
   - instance-segmentation
   - detectron2
+
 # identifiers:
 #   - type: doi
-#     value: "10.xxxx/xxxxx"  # TODO: Add Zenodo or paper DOI after publication
+#     value: "10.xxxx/xxxxx"  # TODO: Add Zenodo DOI after archiving
